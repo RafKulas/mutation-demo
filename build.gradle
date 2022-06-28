@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'info.solidsoft.pitest' version '1.7.4'
 }
 
 group 'dev.kulik.rafal'
@@ -26,4 +27,13 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+pitest {
+    testPlugin.set("junit5")
+    junit5PluginVersion = '0.15'
+    threads.set(4)
+    outputFormats.set(['XML', 'HTML'])
+    exportLineCoverage.set(true)
+    timestampedReports.set(false)
 }
