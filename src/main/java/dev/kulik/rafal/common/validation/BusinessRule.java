@@ -1,11 +1,9 @@
 package dev.kulik.rafal.common.validation;
 
 import dev.kulik.rafal.domain.objects.Description;
-import lombok.Getter;
 
 import java.util.function.Predicate;
 
-@Getter
 public class BusinessRule<T extends ValidatedObject<T>> extends IBusinessRule<T> {
 	private final Predicate<T> matchPredicate;
 

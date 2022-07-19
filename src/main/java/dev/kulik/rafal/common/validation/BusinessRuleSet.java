@@ -20,19 +20,9 @@ public class BusinessRuleSet<T extends ValidatedObject<T>> implements IBusinessR
 	}
 
 	@Override
-	public List<String> getMessages() {
-		return rules.stream().map(rule -> rule.description.getValue()).toList();
-	}
-
-	@Override
 	public List<IBusinessRule<T>> brokenBy(ValidatedObject<T> item) {
 		return this.rules.stream()
 				.filter(rule -> !rule.isSatisfiedBy((T)item))
 				.toList();
-	}
-
-	@Override
-	public boolean contains(IBusinessRule<T> rule) {
-		return rules.contains(rule);
 	}
 }

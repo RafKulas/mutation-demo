@@ -1,11 +1,13 @@
 package dev.kulik.rafal.domain;
 
 import dev.kulik.rafal.common.TestData;
+import dev.kulik.rafal.domain.objects.Description;
 import dev.kulik.rafal.domain.objects.ProductName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -24,14 +26,14 @@ class InvoiceLineTest {
 
 	@ParameterizedTest
 	@ArgumentsSource(TestData.InvoiceLineTestData.InvalidInvoiceLineArgumentProvider.class)
-	public void GivenInvoiceLine_whenOneFieldIsInvalid_expectNotValidated(Money money, ProductName name) {
-		// given
-		var invalidInvoiceLine = new InvoiceLine(money, name);
-
+	public void GivenInvoiceLine_whenOneFieldIsInvalid_expectNotValidated(
+			InvoiceLine invalidInvoiceLine, Description failMessage) {
 		// when
 		var isValid = invalidInvoiceLine.isValid();
+		var brokenRule = invalidInvoiceLine.getBrokenRules().get(0);
 
 		// expect
 		assertFalse(isValid);
+		assertEquals(failMessage, brokenRule.getDescription());
 	}
 }

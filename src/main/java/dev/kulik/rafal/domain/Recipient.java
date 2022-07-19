@@ -11,10 +11,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @AllArgsConstructor
-public class Recipient extends ValidateDomainObject<Recipient> {
+public class Recipient extends ValidateDomainObject<Recipient> implements Cloneable {
 	private final Name name;
 	private final Address address;
 
@@ -23,17 +24,27 @@ public class Recipient extends ValidateDomainObject<Recipient> {
 		return new BusinessRuleSet<>(List.of(ValidationRules.Name, ValidationRules.Address));
 	}
 
+	@Override
+	public Recipient clone() {
+		return new Recipient(
+				new Name(this.getName().getValue()),
+				this.getAddress().clone()
+		);
+	}
+
 	private static class ValidationRules {
 		public static IBusinessRule<Recipient> Name =
 				new BusinessRule<>(
 						Description.of("Recipient name should be specified"),
-						recipient -> !recipient.getName().getValue().trim().isEmpty()
+						recipient -> !Objects.equals(recipient.getName(), null) &&
+								!recipient.name.getValue().trim().isEmpty()
 				);
 
 		public static IBusinessRule<Recipient> Address =
 				new BusinessRule<>(
 						Description.of("Address should be valid"),
-						recipient -> recipient != null && recipient.getAddress().isValid()
+						recipient -> !Objects.equals(recipient.getAddress(), null) &&
+								recipient.getAddress().isValid()
 				);
 	}
 }
