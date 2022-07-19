@@ -13,11 +13,13 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Getter
 @Builder
 @AllArgsConstructor
-public class Invoice extends ValidateDomainObject<Invoice> {
+public class Invoice extends ValidateDomainObject<Invoice> implements Cloneable {
 	private final InvoiceNumber invoiceNumber;
 	private final Recipient recipient;
 	private final Address addressToBill;
@@ -41,29 +43,47 @@ public class Invoice extends ValidateDomainObject<Invoice> {
 				ValidationRules.Lines));
 	}
 
+	@Override
+	public Invoice clone() {
+		return new Invoice(
+				new InvoiceNumber(this.invoiceNumber.getValue()),
+				this.recipient.clone(),
+				this.addressToBill.clone(),
+				this.getLines()
+		);
+	}
+
+	public List<InvoiceLine> getLines() {
+		return this.lines == null ? null : this.lines.stream().map(InvoiceLine::clone).collect(Collectors.toList());
+	}
+
 	public static class ValidationRules {
 		public static IBusinessRule<Invoice> InvoiceNumber =
 				new BusinessRule<>(
 						Description.of("Invoice number should be specified"),
-						invoice -> !invoice.invoiceNumber.getValue().isEmpty()
+						invoice -> !Objects.equals(invoice.getInvoiceNumber(), null) &&
+								!invoice.invoiceNumber.getValue().trim().isEmpty()
 				);
 
 		public static IBusinessRule<Invoice> BillingAddress =
 				new BusinessRule<>(
 						Description.of("Billing address should be valid"),
-						invoice -> invoice.addressToBill != null && invoice.addressToBill.isValid()
+						invoice -> !Objects.equals(invoice.getAddressToBill(), null) &&
+								invoice.addressToBill != null && invoice.addressToBill.isValid()
 				);
 
 		public static IBusinessRule<Invoice> Recipient =
 				new BusinessRule<>(
 						Description.of("Recipient should be valid"),
-						invoice -> invoice.recipient != null && invoice.recipient.isValid()
+						invoice -> !Objects.equals(invoice.getRecipient(), null) &&
+								invoice.recipient != null && invoice.recipient.isValid()
 				);
 
 		public static IBusinessRule<Invoice> Lines =
 				new BusinessRule<>(
 						Description.of("Invoice lines should all be valid"),
-						invoice -> !invoice.lines.isEmpty() && invoice.lines.stream().allMatch(ValidateDomainObject::isValid)
+						invoice -> !Objects.equals(invoice.getLines(), null) &&
+								!invoice.lines.isEmpty() && invoice.lines.stream().allMatch(ValidateDomainObject::isValid)
 				);
 	}
 }

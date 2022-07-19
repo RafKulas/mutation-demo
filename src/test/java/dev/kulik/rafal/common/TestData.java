@@ -11,6 +11,7 @@ import dev.kulik.rafal.domain.Recipient;
 import dev.kulik.rafal.domain.objects.AddressLine;
 import dev.kulik.rafal.domain.objects.City;
 import dev.kulik.rafal.domain.objects.Currencies;
+import dev.kulik.rafal.domain.objects.Currency;
 import dev.kulik.rafal.domain.objects.Description;
 import dev.kulik.rafal.domain.objects.InvoiceNumber;
 import dev.kulik.rafal.domain.objects.Name;
@@ -29,6 +30,18 @@ import java.util.stream.Stream;
 import static java.util.Collections.emptyList;
 
 public class TestData {
+	public static class MoneyTestData {
+		public static final Money validMoney = new Money(
+				Currencies.USD.asCurrency(),
+				new BigDecimal(10)
+		);
+
+		public static final Money invalidMoney = new Money(
+				Currencies.USD.asCurrency(),
+				null
+		);
+	}
+
 	public static class AddressTestData {
 		public static final Address validAddress = new Address(
 				new AddressLine("Slowackiego"),
@@ -39,6 +52,11 @@ public class TestData {
 
 		public static class InvalidAddressesArgumentsProvider implements ArgumentsProvider {
 
+			private static final Description INVALID_CITY_MESSAGE = Description.of("City should be specified");
+			private static final Description INVALID_ZIP_MESSAGE = Description.of("Zip code should be specified");
+			private static final Description INVALID_STATE_MESSAGE = Description.of("State should be properly specified");
+			private static final Description INVALID_ADDRESS_LINE_MESSAGE = Description.of("AddressLine should be specified");
+
 			@Override
 			public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
 				return Stream.of(
@@ -47,8 +65,18 @@ public class TestData {
 										new AddressLine("valid address line"),
 										new City("valid city"),
 										new State("valid state"),
+										null
+								),
+								INVALID_ZIP_MESSAGE
+						),
+						Arguments.of(
+								new Address(
+										new AddressLine("valid address line"),
+										new City("valid city"),
+										new State("valid state"),
 										new Zip("")
-								)
+								),
+								INVALID_ZIP_MESSAGE
 						),
 						Arguments.of(
 								new Address(
@@ -56,7 +84,17 @@ public class TestData {
 										new City("valid city"),
 										new State("valid state"),
 										new Zip(" ")
-								)
+								),
+								INVALID_ZIP_MESSAGE
+						),
+						Arguments.of(
+								new Address(
+										new AddressLine("valid address line"),
+										new City("valid city"),
+										null,
+										new Zip("80-233")
+								),
+								INVALID_STATE_MESSAGE
 						),
 						Arguments.of(
 								new Address(
@@ -64,7 +102,8 @@ public class TestData {
 										new City("valid city"),
 										new State(" "),
 										new Zip("80-233")
-								)
+								),
+								INVALID_STATE_MESSAGE
 						),
 						Arguments.of(
 								new Address(
@@ -72,7 +111,17 @@ public class TestData {
 										new City("valid city"),
 										new State(""),
 										new Zip("80-233")
-								)
+								),
+								INVALID_STATE_MESSAGE
+						),
+						Arguments.of(
+								new Address(
+										new AddressLine("valid address line"),
+										null,
+										new State("valid state"),
+										new Zip("80-233")
+								),
+								INVALID_CITY_MESSAGE
 						),
 						Arguments.of(
 								new Address(
@@ -80,7 +129,8 @@ public class TestData {
 										new City(""),
 										new State("valid state"),
 										new Zip("80-233")
-								)
+								),
+								INVALID_CITY_MESSAGE
 						),
 						Arguments.of(
 								new Address(
@@ -88,7 +138,17 @@ public class TestData {
 										new City(" "),
 										new State("valid state"),
 										new Zip("80-233")
-								)
+								),
+								INVALID_CITY_MESSAGE
+						),
+						Arguments.of(
+								new Address(
+										null,
+										new City("valid city"),
+										new State("valid state"),
+										new Zip("80-233")
+								),
+								INVALID_ADDRESS_LINE_MESSAGE
 						),
 						Arguments.of(
 								new Address(
@@ -96,7 +156,8 @@ public class TestData {
 										new City("valid city"),
 										new State("valid state"),
 										new Zip("80-233")
-								)
+								),
+								INVALID_ADDRESS_LINE_MESSAGE
 						),
 						Arguments.of(
 								new Address(
@@ -104,7 +165,8 @@ public class TestData {
 										new City("valid city"),
 										new State("valid state"),
 										new Zip("80-233")
-								)
+								),
+								INVALID_ADDRESS_LINE_MESSAGE
 						)
 				);
 			}
@@ -117,12 +179,32 @@ public class TestData {
 
 		public static class InvalidRecipientArgumentsProvider implements ArgumentsProvider {
 
+			private static final Description INVALID_NAME_MESSAGE = Description.of("Recipient name should be specified");
+			private static final Description INVALID_ADDRESS_MESSAGE = Description.of("Address should be valid");
+
 			@Override
 			public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
 				return Stream.of(
-						Arguments.of(VALID_ADDRESS, new Name("")),
-						Arguments.of(VALID_ADDRESS, new Name(" ")),
-						Arguments.of(INVALID_ADDRESS, new Name("Valid Name"))
+						Arguments.of(
+								new Recipient(null, VALID_ADDRESS),
+								INVALID_NAME_MESSAGE
+						),
+						Arguments.of(
+								new Recipient(new Name(""), VALID_ADDRESS),
+								INVALID_NAME_MESSAGE
+						),
+						Arguments.of(
+								new Recipient(new Name(" "), VALID_ADDRESS),
+								INVALID_NAME_MESSAGE
+						),
+						Arguments.of(
+								new Recipient(new Name("Valid Name"), null),
+								INVALID_ADDRESS_MESSAGE
+						),
+						Arguments.of(
+								new Recipient(new Name("Valid Name"), INVALID_ADDRESS),
+								INVALID_ADDRESS_MESSAGE
+						)
 				);
 			}
 		}
@@ -134,12 +216,34 @@ public class TestData {
 
 		public static class InvalidInvoiceLineArgumentProvider implements ArgumentsProvider {
 
+			private static final Description INVALID_MONEY_MESSAGE =
+					Description.of("Money should be valid");
+			private static final Description INVALID_PRODUCT_NAME_MESSAGE =
+					Description.of("Product name should be specified");
+
 			@Override
 			public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
 				return Stream.of(
-						Arguments.of(INVALID_MONEY, new ProductName("Valid product name")),
-						Arguments.of(VALID_MONEY, new ProductName(" ")),
-						Arguments.of(VALID_MONEY, new ProductName(""))
+						Arguments.of(
+								new InvoiceLine(null, new ProductName("Valid product name")),
+								INVALID_MONEY_MESSAGE
+						),
+						Arguments.of(
+								new InvoiceLine(INVALID_MONEY, new ProductName("Valid product name")),
+								INVALID_MONEY_MESSAGE
+						),
+						Arguments.of(
+								new InvoiceLine(VALID_MONEY, null),
+								INVALID_PRODUCT_NAME_MESSAGE
+						),
+						Arguments.of(
+								new InvoiceLine(VALID_MONEY, new ProductName(" ")),
+								INVALID_PRODUCT_NAME_MESSAGE
+						),
+						Arguments.of(
+								new InvoiceLine(VALID_MONEY, new ProductName("")),
+								INVALID_PRODUCT_NAME_MESSAGE
+						)
 				);
 			}
 		}
@@ -154,9 +258,28 @@ public class TestData {
 		public static InvoiceLine INVALID_INVOICE_LINE = Stubs.AlwaysInvalidInvoiceLine.get();
 
 		public static class InvalidInvoiceArgumentProvider implements ArgumentsProvider {
+
+			private static final Description INVALID_INVOICE_NUMBER_MESSAGE =
+					Description.of("Invoice number should be specified");
+			private static final Description INVALID_RECIPIENT_MESSAGE =
+					Description.of("Recipient should be valid");
+			private static final Description INVALID_ADDRESS_MESSAGE =
+					Description.of("Billing address should be valid");
+			private static final Description INVALID_INVOICE_LINES_MESSAGE =
+					Description.of("Invoice lines should all be valid");
+
 			@Override
 			public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
 				return Stream.of(
+						Arguments.of(
+								new Invoice(
+										null,
+										VALID_RECIPIENT,
+										VALID_ADDRESS,
+										List.of(VALID_INVOICE_LINE)
+								),
+								INVALID_INVOICE_NUMBER_MESSAGE
+						),
 						Arguments.of(
 								new Invoice(
 										new InvoiceNumber(""),
@@ -164,31 +287,61 @@ public class TestData {
 										VALID_ADDRESS,
 										List.of(VALID_INVOICE_LINE)
 								),
+								INVALID_INVOICE_NUMBER_MESSAGE
+						),
+						Arguments.of(
 								new Invoice(
 										new InvoiceNumber(" "),
 										VALID_RECIPIENT,
 										VALID_ADDRESS,
 										List.of(VALID_INVOICE_LINE)
 								),
+								INVALID_INVOICE_NUMBER_MESSAGE),
+						Arguments.of(
+								new Invoice(
+										new InvoiceNumber("1"),
+										null,
+										VALID_ADDRESS,
+										List.of(VALID_INVOICE_LINE)
+								),
+								INVALID_RECIPIENT_MESSAGE
+						),
+						Arguments.of(
 								new Invoice(
 										new InvoiceNumber("1"),
 										INVALID_RECIPIENT,
 										VALID_ADDRESS,
 										List.of(VALID_INVOICE_LINE)
 								),
-								new Invoice(
+								INVALID_RECIPIENT_MESSAGE),
+						Arguments.of(new Invoice(
+										new InvoiceNumber("1"),
+										VALID_RECIPIENT,
+										null,
+										List.of(VALID_INVOICE_LINE)
+								),
+								INVALID_ADDRESS_MESSAGE),
+						Arguments.of(new Invoice(
 										new InvoiceNumber("1"),
 										VALID_RECIPIENT,
 										INVALID_ADDRESS,
 										List.of(VALID_INVOICE_LINE)
 								),
-								new Invoice(
+								INVALID_ADDRESS_MESSAGE),
+						Arguments.of(new Invoice(
 										new InvoiceNumber("1"),
 										VALID_RECIPIENT,
-										INVALID_ADDRESS,
+										VALID_ADDRESS,
+										null
+								),
+								INVALID_INVOICE_LINES_MESSAGE),
+						Arguments.of(new Invoice(
+										new InvoiceNumber("1"),
+										VALID_RECIPIENT,
+										VALID_ADDRESS,
 										List.of(INVALID_INVOICE_LINE)
-								)
-						)
+								),
+								INVALID_INVOICE_LINES_MESSAGE)
 				);
 			}
 		}

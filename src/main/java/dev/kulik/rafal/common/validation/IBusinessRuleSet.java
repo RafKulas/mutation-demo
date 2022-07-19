@@ -7,9 +7,5 @@ public interface IBusinessRuleSet<T> {
 
 	boolean isEmpty();
 
-	List<String> getMessages();
-
 	List<IBusinessRule<T>> brokenBy(ValidatedObject<T> item);
-
-	boolean contains(IBusinessRule<T> rule);
 }

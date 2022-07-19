@@ -11,10 +11,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @AllArgsConstructor
-public class InvoiceLine extends ValidateDomainObject<InvoiceLine> {
+public class InvoiceLine extends ValidateDomainObject<InvoiceLine> implements Cloneable {
 	private final Money money;
 	private final ProductName productName;
 
@@ -23,14 +24,24 @@ public class InvoiceLine extends ValidateDomainObject<InvoiceLine> {
 		return new BusinessRuleSet<>(List.of(ValidationRules.Money, ValidationRules.ProductName));
 	}
 
+	@Override
+	public InvoiceLine clone() {
+		return new InvoiceLine(
+				new Money(this.getMoney().getCurrency(), this.getMoney().getAmount()),
+				new ProductName(this.getProductName().getValue())
+		);
+	}
+
 	private static class ValidationRules {
 		public static IBusinessRule<InvoiceLine> ProductName =
 				new BusinessRule<>(
 						Description.of("Product name should be specified"),
-						line -> !line.productName.getValue().trim().isEmpty());
+						line -> !Objects.equals(line.getProductName(), null) &&
+								!line.productName.getValue().trim().isEmpty());
 		public static IBusinessRule<InvoiceLine> Money =
 				new BusinessRule<>(
 						Description.of("Money should be valid"),
-						line -> line.money != null && line.money.isValid());
+						line -> !Objects.equals(line.getMoney(), null) &&
+								line.money != null && line.money.isValid());
 	}
 }

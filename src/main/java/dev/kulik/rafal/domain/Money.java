@@ -11,6 +11,7 @@ import dev.kulik.rafal.domain.objects.Description;
 import dev.kulik.rafal.common.BaseCurrencyConverter;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.math.BigDecimal;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Getter
+@EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 public class Money extends ValidateDomainObject<Money> {
 	public static Money ZERO = new Money(BigDecimal.ZERO);
@@ -46,26 +48,18 @@ public class Money extends ValidateDomainObject<Money> {
 
 	@Override
 	protected IBusinessRuleSet<Money> rules() {
-		return new BusinessRuleSet<>(List.of(ValidationRules.Currency));
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(this.amount, this.currency);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof Money other)) {
-			return false;
-		}
-		return getAmount().equals(other.getAmount());
+		return new BusinessRuleSet<>(List.of(ValidationRules.Currency, ValidationRules.Amount));
 	}
 
 	private static class ValidationRules {
 		public static IBusinessRule<Money> Currency =
 				new BusinessRule<>(
 						new Description("Currency should be specified"),
-						money -> !money.getCurrency().getValue().isEmpty());
+						money -> !Objects.equals(money.getCurrency(), null) &&
+								!money.currency.getValue().isEmpty());
+		public static IBusinessRule<Money> Amount =
+				new BusinessRule<>(
+						new Description("Amount shouldn't be null"),
+						money -> !Objects.equals(money.getAmount(), null));
 	}
 }
