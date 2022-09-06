@@ -1,7 +1,15 @@
 package dev.kulik.rafal.domain;
 
-import dev.kulik.rafal.domain.objects.*;
-import dev.kulik.rafal.common.validation.*;
+import dev.kulik.rafal.common.validation.BusinessRule;
+import dev.kulik.rafal.common.validation.BusinessRuleSet;
+import dev.kulik.rafal.common.validation.IBusinessRule;
+import dev.kulik.rafal.common.validation.IBusinessRuleSet;
+import dev.kulik.rafal.common.validation.ValidateDomainObject;
+import dev.kulik.rafal.domain.objects.AddressLine;
+import dev.kulik.rafal.domain.objects.City;
+import dev.kulik.rafal.domain.objects.Description;
+import dev.kulik.rafal.domain.objects.State;
+import dev.kulik.rafal.domain.objects.Zip;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
