@@ -1,9 +1,13 @@
 package dev.kulik.rafal.domain;
 
+import dev.kulik.rafal.common.validation.BusinessRule;
+import dev.kulik.rafal.common.validation.BusinessRuleSet;
+import dev.kulik.rafal.common.validation.IBusinessRule;
+import dev.kulik.rafal.common.validation.IBusinessRuleSet;
+import dev.kulik.rafal.common.validation.ValidateDomainObject;
 import dev.kulik.rafal.domain.objects.Currencies;
 import dev.kulik.rafal.domain.objects.Currency;
 import dev.kulik.rafal.domain.objects.Description;
-import dev.kulik.rafal.common.validation.*;
 import dev.kulik.rafal.common.BaseCurrencyConverter;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
