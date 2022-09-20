@@ -28,3 +28,30 @@ var invoiceHasProperRecipient = !invoice
 
 assert invoiceHasProperRecipient == true
 ```
+
+## Add Unit Tests
+
+To make sure that our library validates invoices correctly, we need to write some tests. Since the logic is quite simple, the best solution is unit tests.
+
+With power and magic of JUnit5 we can write simple tests like:
+
+```java
+@Test
+public void givenInvoice_whenAllFieldsAreProperlyFilledExceptDiscount_expectValid() {
+    // given
+    var validInvoice = new Invoice(
+            new InvoiceNumber("1"),
+            TestData.InvoiceTestData.VALID_RECIPIENT,
+            TestData.InvoiceTestData.VALID_ADDRESS,
+            List.of(TestData.InvoiceTestData.VALID_INVOICE_LINE)
+    );
+
+    // when
+    var isValid = validInvoice.isValid();
+
+    // expect
+    assertTrue(isValid);
+}
+```
+
+Which takes a fully valid invoice and checks that our validator returns the correct answer (which is `true`, since every field is filled in correctly).
