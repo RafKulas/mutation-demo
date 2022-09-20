@@ -7,3 +7,24 @@
 2. [Step 2 - Create unit tests for project](https://github.com/RafKulas/mutation-demo/tree/step_2/create_tests#add-unit-tests)
 3. [Step 3 - Add mutation testing plugin](https://github.com/RafKulas/mutation-demo/tree/step_3/add_mutation_tests#add-mutation-testing)
 4. [Step 4 - Improve and refactor existing tests](https://github.com/RafKulas/mutation-demo/tree/step_4/refactor_after_pitest#improve-and-refactor-tests)
+
+## Create simple project
+
+For testing, it will be easiest to create a library that is simple to test. A fairly simple real-world example is an invoice system and its validation.
+
+A library created in this way will be able to create invoices and validate them, and in case of a problem, it will be easy to retrieve what caused the validation error.
+
+Example of use:
+```java
+var invoice = Invoice
+        .builder()
+        .recipient(rafKulas)
+        .invoiceNumber(invoiceNumber)
+        .addressToBill(address)
+        .lines(invoiceLines)
+        .build();
+var invoiceHasProperRecipient = !invoice
+        .getBrokenRules().contains(Invoice.ValidationRules.Recipient);
+
+assert invoiceHasProperRecipient == true
+```
