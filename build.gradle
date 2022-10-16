@@ -30,7 +30,7 @@ test {
 }
 
 pitest {
-    junit5PluginVersion = '0.15'
+    junit5PluginVersion = '1.0.0'
     threads.set(4)
     outputFormats.set(['XML', 'HTML'])
     exportLineCoverage.set(true)

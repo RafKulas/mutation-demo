@@ -1,6 +1,7 @@
 # Mutation testing with Pitest (PIT)
 
-**To begin with, the purpose of this project is NOT a theoretical introduction to mutation testing. I would more like to present the practical application of the [Pitest](https://pitest.org/) plugin (being more precisely, [Gradle version](https://gradle-pitest-plugin.solidsoft.info/) of it *#TeamGradle*) and what can be achieved with it.**
+**To begin with, the purpose of this project is NOT a theoretical 
+introduction to mutation testing. I would more like to present the practical application of the [Pitest](https://pitest.org/) plugin (being more precisely, [Gradle version](https://gradle-pitest-plugin.solidsoft.info/) of it *#TeamGradle*) and what can be achieved with it.**
 
 ### Table of Content
 1. [Step 1 - Create simple project to have canvas to work on](https://github.com/RafKulas/mutation-demo/tree/step_1/create_project#create-simple-project)
@@ -10,9 +11,11 @@
 
 ## Create simple project
 
-For testing, it will be easiest to create a library that is simple to test. A fairly simple real-world example is an invoice system and its validation.
+For testing, it will be easiest to create a library that is simple to test. 
+A fairly simple real-world example is an invoice system and its validation.
 
-A library created in this way will be able to create invoices and validate them, and in case of a problem, it will be easy to retrieve what caused the validation error.
+A library created in this way will be able to create invoices and validate them, 
+and in case of a problem, it will be easy to retrieve what caused the validation error.
 
 Example of use:
 ```java
@@ -31,7 +34,8 @@ assert invoiceHasProperRecipient == true
 
 ## Add Unit Tests
 
-To make sure that our library validates invoices correctly, we need to write some tests. Since the logic is quite simple, the best solution is unit tests.
+To make sure that our library validates invoices correctly, we need to write some tests. 
+Since the logic is quite simple, the best solution is unit tests.
 
 With power and magic of JUnit5 we can write simple tests like:
 
@@ -54,4 +58,43 @@ public void givenInvoice_whenAllFieldsAreProperlyFilledExceptDiscount_expectVali
 }
 ```
 
-Which takes a fully valid invoice and checks that our validator returns the correct answer (which is `true`, since every field is filled in correctly).
+Which takes a fully valid invoice and checks that our validator returns the correct answer 
+(which is `true`, since every field is filled in correctly).
+
+## Add mutation testing
+
+To add mutation tests to our project, the easiest way is to use the PITest Plugin 
+ported to Gradle by [Marcin Zajączkowski](https://github.com/szpak).
+Here I would recommend to read short quickstart [documentation](https://gradle-pitest-plugin.solidsoft.info/).
+We will use easiest approach which is single project with one report. 
+You can do it by adding PITest plugin to your `build.*` file.
+
+If you are using groovy, like me, your new part should look something like this:
+```groovy
+plugins {
+    id 'java'
+    id 'info.solidsoft.pitest' version '1.9.0'
+}
+
+<...>
+
+test {
+    useJUnitPlatform()
+}
+pitest {
+    junit5PluginVersion = '1.0.0'
+    threads.set(4)
+    threads.set(<Any amount you need>)
+    exportLineCoverage.set(true)
+    timestampedReports.set(false)
+}
+```
+
+With this you can either run command verification/pitest in your IDE or 
+use command line in your working directory:
+```shell
+./gradlew pitest
+```
+
+In this process you should get report in `build/reports` folder in `index.html` and `mutations.xml` file.
+With given result you can analyze quality of your tests.
