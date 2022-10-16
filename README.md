@@ -98,3 +98,27 @@ use command line in your working directory:
 
 In this process you should get report in `build/reports` folder in `index.html` and `mutations.xml` file.
 With given result you can analyze quality of your tests.
+
+## Improve existing tests
+
+After analyze of report we can see that our score os not that bad but neither good, 
+something in between and because we want to have top quality product we will fix it!
+
+We got worst score on packages `dev.kulik.rafal.domain` and `dev.kulik.rafal.domain.objects`:
+
+| Name                             | Line Coverage | Mutation Coverage | Test Strength |
+|----------------------------------|:-------------:|:-----------------:|:-------------:|
+| `dev.kulik.rafal.domain`         |      76%      |        57%        |      81%      |
+| `dev.kulik.rafal.domain.objects` |     100%      |        10%        |      33%      |
+
+We can check what classes we neglected (low code coverage) and what is truly tested (low mutation coverage).
+After some investigation we can find out we didn't tested `isValid()` function. 
+We didn't check if there were broken rules. Also, there were no null checks.
+After fixing those thing we can increase our test quality to:
+
+| Name                             | Line Coverage | Mutation Coverage | Test Strength |
+|----------------------------------|:-------------:|:-----------------:|:-------------:|
+| `dev.kulik.rafal.domain`         |      95%      |        76%        |      89%      |
+| `dev.kulik.rafal.domain.objects` |     100%      |        33%        |      71%      |
+
+Which is much more impressive as a score
